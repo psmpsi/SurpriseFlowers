@@ -17,19 +17,21 @@ class FlowerTest(unittest.TestCase):
         self.assertEquals(flowermap,expected)
         os.remove(flowers.filename)
 
-    def test_check_file_absent(self):        
+    def test_check_file_absent(self):
         if os.path.isfile(flowers.filename):
             os.remove(flowers.filename)
 
         expected = {'flowerday':None, 'current_month':None, 'email_sent':False}
         flowermap, file_status = flowers.check_file(flowers.filename)
         self.assertEquals(flowermap, expected)
-        
+
         with open(flowers.filename, 'r') as f:
             flowermap = json.loads(f.read())
         self.assertEquals(flowermap, expected)
 
-    # test the method that checks to see if it should send an email 
+def test_check_date_for_emailer(self):
+    # test the method that checks to see if it should send an email
+    run_conditions = []
     def test_check_emailer1(self):
         todays_date = datetime.date(2013,6,24)
         flowermap = {"flowerday": 23, "current_month": 6, "email_sent": True}
@@ -41,7 +43,7 @@ class FlowerTest(unittest.TestCase):
         flowermap = {"flowerday": 23, "current_month": 6, "email_sent": False}
         expected = 'email not sent'
         self.assert_check_emailer(todays_date, flowermap, expected)
-    
+
     def test_check_emailer3(self):
         todays_date = datetime.date(2013,6,13)
         flowermap = {"flowerday": 23, "current_month": 6, "email_sent": False}
@@ -72,28 +74,21 @@ class FlowerTest(unittest.TestCase):
         email_status = flowers.check_date_for_emailer(flowermap, todays_date, test_email_chris)
         self.assertEquals(email_status, expected)
 
-    # test the method that checks to see if it should generate a random date
-    def test_check_generator1(self):
-        todays_date = datetime.date(2013,6,23)
-        flowermap = {"flowerday": 23, "current_month": 6, "email_sent": False}
-        expected = 'date not generated'
-        self.assert_check_generator(flowermap, expected, todays_date)
+# test the method that checks to see if it should generate a random date
+class test_check_date_for_generator(unittest.TestCase):
 
-    def test_check_generator2(self):
-        todays_date = datetime.date(2013,6,23)
-        flowermap = {"flowerday": 24, "current_month": 6, "email_sent": True}
-        expected = 'date not generated'
-        self.assert_check_generator(flowermap, expected, todays_date)
+    def setUp(self):
+        self.todays_date = datetime.date(2013,6,23)
 
-    def test_check_generator3(self):
-        todays_date = datetime.date(2013,6,23)
-        flowermap = {"flowerday": 23, "current_month": 5, "email_sent": False}
-        expected = 'date was generated'
-        self.assert_check_generator(flowermap, expected, todays_date)
+    def run(self):
+        run_conditions = [[{"flowerday": 23, "current_month": 6, "email_sent": False}, 'date not generated'],
+                      [{"flowerday": 24, "current_month": 6, "email_sent": True}, 'date not generated'],
+                      [{"flowerday": 23, "current_month": 5, "email_sent": False}, 'date was generated']]
 
-    def assert_check_generator(self, flowermap, expected, todays_date):
-        flowermap, generator_status = flowers.check_date_for_generator(flowermap, todays_date)
-        self.assertEquals(generator_status, expected)
+        for flowermap_and_expected in run_conditions:
+            flowermap, generator_status = flowers.check_date_for_generator(flowermap, todays_date)
+            self.assertEquals(generator_status, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
