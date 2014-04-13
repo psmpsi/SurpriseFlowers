@@ -32,9 +32,13 @@ filename = os.path.join(PROJECT_ROOT, 'flowerdate.txt')
 
 class SurpriseFlowers(object):
 
-    def __init__(self):
-        self.date = datetime.date.today()
-        self.flowermap = {}
+    def __init__(self, date=None, flowermap=None):
+        self.date = date
+        self.flowermap = flowermap
+        if not self.date:
+            self.date = datetime.date.today()
+        if not self.flowermap:
+            self.flowermap = {}
 
 
     def date_generator(self):
@@ -129,7 +133,7 @@ class SurpriseFlowers(object):
             self.flowermap['current_month'] == 12 and self.date.month == 1) or
                 self.flowermap['flowerday'] == None):
             generator_status = 'date was generated'
-            self.flowermap = date_generator(self.date)
+            self.flowermap = self.date_generator()
         # print generator_status
         return self.flowermap, generator_status
 
