@@ -19,13 +19,15 @@ username = 'none'
 password = 'none'
 
 try:
-    import local_settings as settings
-    username = settings.USERNAME
-    password = settings.PASSWORD
-    fromaddr = settings.FROMADDR
-    toaddr = settings.TOADDR
+    import email_config
+    username = email_config.USERNAME
+    password = email_config.PASSWORD
+    fromaddr = email_config.FROMADDR
+    toaddr = email_config.TOADDR
+    flower_sender_name = email_config.SENDERNAME
+    flower_recipient_name = email_config.RECIPIENTNAME
 except ImportError:
-    pass
+    raise Warning("could not find local email_config")
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 filename = os.path.join(PROJECT_ROOT, 'flowerdate.txt')
@@ -54,7 +56,7 @@ class SurpriseFlowers(object):
             # add self.date to flowerdates.txt
         return self.flowermap
 
-    def email_chris(self):
+    def send_email(self):
         # This function creates and sends the email, using smtplib
         # email_subject = "Subject: Surprise Flowers!\n\n"
         # msg['Subject'] = 'The contents of %s' % textfile
@@ -62,10 +64,11 @@ class SurpriseFlowers(object):
         # msg['To'] = you
 
         msg = """Subject: Surprise Flowers!\n\n
-        Megan is great.\n
-        I love Megan.\n
-        You know how I can tell her she's great?  FLOWERS!\n
-        I should buy her flowers."""
+        {0} is great.\n
+        I love {0}.\n
+        You know how I can tell {0} that {0} is great?  FLOWERS!\n
+        I should buy {0} flowers."""
+        msg.format(RECIPIENTNAME)
 
         try:
             server = smtplib.SMTP('smtp.gmail.com:587')
@@ -126,8 +129,6 @@ class SurpriseFlowers(object):
 
         generator_status = 'date not generated'
 
-        # if today is the first day of the month
-        # or the first time we ran the program this month pick a random day of the month to buy flowers for me.
         if ((self.date.day >= 1 and
             (self.flowermap['current_month'] < self.date.month) or
             self.flowermap['current_month'] == 12 and self.date.month == 1) or
@@ -148,7 +149,7 @@ def main(self, callback):
     email_status = check_date_for_emailer(self.flowermap, self.date, callback)
 
 if __name__ == '__main__':
-    main(datetime.date.today(), email_chris)
+    main(datetime.date.today(), send_email)
 
 
 
